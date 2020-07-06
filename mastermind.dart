@@ -6,8 +6,8 @@ import "package:trotter/trotter.dart";
 void clearScreen() => print("\x1B[2J\x1B[0;0H");
 
 enum Player {human, computer}
-
 enum Color {red, yellow, green, blue, white, black}
+enum Response {white, black}
 
 Color stringToColor(String letter) {
 	switch (letter) {
@@ -43,8 +43,6 @@ String colorsToString(List<Color> colors) => [
 		colorToString(color)
 ].join(", ");
 
-enum Response {white, black}
-
 Response stringToResponse(String letter) {
 	switch (letter) {
 		case "K": return Response.black;
@@ -74,7 +72,6 @@ String responsesToString(List<Response> responses) => [
 class Attempt {
 	final List<Color> code;
 	final List<Response> response;
-
 	const Attempt(this.code, this.response);
 
 	@override
@@ -252,10 +249,13 @@ class PlayerCodemaker extends Codemaker {
 	}
 }
 
+Player getPlayer(Set<String> commands, List<String> args) => 
+	commands.any(args.contains) ? Player.human : Player.computer;
+
 void main(List<String> args) {
 	final Game game = Game(
-		guesserPlayer: Player.computer, 
-		codemakerPlayer: Player.computer, 
+		guesserPlayer: getPlayer({"-g", "--guess"}, args),
+		codemakerPlayer: getPlayer({"-c", "--code"}, args),
 		debug: {"-d", "--debug"}.any(args.contains)
 	);
 
